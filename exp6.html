@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Freehand SVG Drawing Tool</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial;background:#f3f4f6}
+    .container{max-width:920px;margin:28px auto;padding:18px;border:2px solid #111827;background:#ffffff}
+    h1{margin:0 0 12px;font-size:20px;color:#111827}
+    .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .canvas-wrap{border:2px solid #111827;padding:8px;background:#f8fafc}
+    svg{display:block;width:100%;height:500px;background:#ffffff;cursor:crosshair}
+    .controls label{font-size:13px;color:#374151}
+    .btn{padding:6px 10px;border:1px solid #cbd5e1;background:#fff;cursor:pointer}
+    .btn-danger{border-color:#ef4444;color:#b91c1c}
+    .meta{margin-left:auto;font-size:13px;color:#6b7280}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>SVG Drawing Tool</h1>
+    <div class="toolbar">
+      <label>Color <input id="color" type="color" value="#0ea5e9" /></label>
+      <label>Stroke <input id="stroke" type="number" min="1" max="20" value="3" style="width:64px"/></label>
+      <button id="undo" class="btn">Undo</button>
+      <button id="clear" class="btn btn-danger">Clear</button>
+      <div class="meta">Hold mouse (or touch) and drag to draw</div>
+    </div>
+
+    <div class="canvas-wrap">
+      <svg id="svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="1200" height="800" fill="#f8fafc"></rect>
+        <g id="strokes"></g>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const svg = document.getElementById('svg');
+    const strokesGroup = document.getElementById('strokes');
+    const colorInput = document.getElementById('color');
+    const strokeInput = document.getElementById('stroke');
+    const undoBtn = document.getElementById('undo');
+    const clearBtn = document.getElementById('clear');
+
+    let drawing = false;
+    let currentPath = null;
+    let points = []; 
+    const saved = []; 
+
+    function toSVGPoint(clientX, clientY){
+      const pt = svg.createSVGPoint();
+      pt.x = clientX; 
+      pt.y = clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    }
+
+    function startStroke(clientX, clientY){
+      drawing = true;
+      points = [];
+      const p = toSVGPoint(clientX, clientY);
+      points.push([p.x, p.y]);
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('fill','none');
+      path.setAttribute('stroke', colorInput.value);
+      path.setAttribute('stroke-width', strokeInput.value);
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('d', `M ${p.x} ${p.y}`);
+      path.setAttribute('class','user-stroke');
+
+      currentPath = path;
+      strokesGroup.appendChild(path);
+    }
+
+    function updateStroke(clientX, clientY){
+      if (!drawing || !currentPath) return;
+      const p = toSVGPoint(clientX, clientY);
+      points.push([p.x, p.y]);
+
+      if (points.length < 3){
+        const d = `M ${points[0][0]} ${points[0][1]} L ${points[points.length-1][0]} ${points[points.length-1][1]}`;
+        currentPath.setAttribute('d', d);
+        return;
+      }
+
+      let d = `M ${points[0][0]} ${points[0][1]}`;
+      for (let i = 1; i < points.length - 1; i++){
+        const [x1,y1] = points[i];
+        const [x2,y2] = points[i+1];
+        const cx = (x1 + x2) / 2;
+        const cy = (y1 + y2) / 2;
+        d += ` Q ${x1} ${y1} ${cx} ${cy}`;
+      }
+      const last = points[points.length-1];
+      d += ` L ${last[0]} ${last[1]}`;
+
+      currentPath.setAttribute('d', d);
+    }
+
+    function endStroke(){
+      if (!drawing) return;
+      drawing = false;
+      if (!currentPath) return;
+
+      const bbox = currentPath.getBBox();
+      if (bbox.width < 2 && bbox.height < 2){
+        currentPath.remove();
+      } else {
+        currentPath.setAttribute('stroke', colorInput.value);
+        currentPath.setAttribute('stroke-width', strokeInput.value);
+        saved.push(currentPath);
+      }
+
+      currentPath = null;
+      points = [];
+    }
+
+    svg.addEventListener('pointerdown', (e)=>{
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      svg.setPointerCapture(e.pointerId);
+      startStroke(e.clientX, e.clientY);
+      e.preventDefault();
+    });
+
+    svg.addEventListener('pointermove', (e)=>{
+      if (!drawing) return;
+      updateStroke(e.clientX, e.clientY);
+    });
+
+    svg.addEventListener('pointerup', (e)=>{
+      svg.releasePointerCapture(e.pointerId);
+      endStroke();
+    });
+
+    svg.addEventListener('pointercancel', (e)=>{
+      svg.releasePointerCapture(e.pointerId);
+      endStroke();
+    });
+
+    undoBtn.addEventListener('click', ()=>{
+      const last = saved.pop();
+      if (last) last.remove();
+    });
+    clearBtn.addEventListener('click', ()=>{
+      while(saved.length) saved.pop().remove();
+    });
+
+    svg.addEventListener('touchstart', (e)=>{ e.preventDefault(); }, {passive:false});
+  </script>
+</body>
+</html>

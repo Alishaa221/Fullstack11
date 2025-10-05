@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-color: white;
+      --text-color: black;
+      --header-footer-bg: #A67B5B;
+      --nav-bg: #f8dca8;
+      --link-color:black;
+      --card-bg: #ffffff;
+    }
+
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #e0e0e0;
+      --header-footer-bg: #333;
+      --nav-bg: #2b2b2b;
+      --link-color: #e0ca8d;
+      --card-bg: #2e2e2e;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      transition: all 0.3s ease;
+    }
+
+    header {
+      background-color: var(--header-footer-bg);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 24px;
+      height: 80px;
+    }
+
+    main {
+      border: 2px solid black;
+      flex: 1;
+      display: flex;
+    }
+
+    nav {
+      width: 200px;
+      background-color: var(--nav-bg);
+      padding: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    nav a {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--link-color);
+      text-decoration: none;
+      font-size: 18px;
+      
+    }
+    section {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    footer {
+      background-color: var(--header-footer-bg);
+      color: white;
+      text-align: center;
+      font-size: 18px;
+      padding: 10px;
+      height: 60px;
+    }
+
+    .dark-mode-toggle {
+      font-size: 14px;
+    }
+
+    canvas {
+      width: 150%;
+      width: 500px;
+      height: 400px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .card {
+      flex: 1 1 200px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .card p {
+      font-size: 24px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Admin Dashboard</div>
+    <div class="dark-mode-toggle">
+      <input type="checkbox" id="darkModeToggle"> Dark Mode
+    </div>
+  </header>
+
+  <main>
+    <nav>
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="users.html">Users</a></li>
+        <li><a href="settings.html">Settings</a></li>
+      </ul>
+    </nav>
+      
+    <section>
+      <h3>Welcome, Admin!</h3>
+      <p>This is the main content area.</p>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Total Users</h3>
+          <p>1,200</p>
+        </div>
+        <div class="card">
+          <h3>Active Users</h3>
+          <p>900</p>
+        </div>
+        <div class="card">
+          <h3>Inactive Users</h3>
+          <p>300</p>
+        </div>
+        <div class="card">
+          <h3>Traffic</h3>
+          <p>15,000</p>
+        </div>
+      </div>
+
+      <h4>Weekly User Visits</h4>
+      <canvas id="userChart"></canvas>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Admin Panel
+  </footer>
+
+  <script>
+    // Dark Mode Toggle
+    const toggle = document.getElementById('darkModeToggle');
+    toggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark', toggle.checked);
+    });
+
+    // Chart.js Line Chart for Weekly Users
+    const ctx = document.getElementById('userChart').getContext('2d');
+    const userChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Users',
+          data: [120, 150, 180, 220, 170, 200, 250],
+          borderColor: 'green',
+          backgroundColor: 'rgba(76, 175, 80, 0.2)',
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: 'white',
+          pointBorderColor:'green',
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: getComputedStyle(document.body).getPropertyValue('--text-color')
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: getComputedStyle(document.body).getPropertyValue('--text-color')
+            }
+          },
+          y: {
+            ticks: {
+              color: getComputedStyle(document.body).getPropertyValue('--text-color')
+            }
+          }
+        }
+      }
+    });
+
+    // Update chart when theme changes
+    toggle.addEventListener('change', () => {
+      setTimeout(() => {
+        userChart.options.plugins.legend.labels.color = getComputedStyle(document.body).getPropertyValue('--text-color');
+        userChart.options.scales.x.ticks.color = getComputedStyle(document.body).getPropertyValue('--text-color');
+        userChart.options.scales.y.ticks.color = getComputedStyle(document.body).getPropertyValue('--text-color');
+        userChart.update();
+      }, 150);
+    });
+  </script>
+</body>
+</html>

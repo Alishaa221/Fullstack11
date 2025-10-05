@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playing Card Collection</title>
+    <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+    <header>
+        <h1>Playing Card Collection</h1>
+    </header>
+
+    <main>
+        <section class="add-card">
+            <h2>Add New Card</h2>
+            <form id="add-card-form">
+                <div class="form-group">
+                    <label for="suit">Suit:</label>
+                    <input type="text" id="suit" name="suit" required>
+                </div>
+                <div class="form-group">
+                    <label for="value">Value:</label>
+                    <input type="text" id="value" name="value" required>
+                </div>
+                <button type="submit">Add Card</button>
+            </form>
+        </section>
+
+        <section class="card-list-container">
+            <h2>Current Cards</h2>
+            <div id="card-list" class="card-list">
+                </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

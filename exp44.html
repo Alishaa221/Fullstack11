@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Character Counter for Textarea</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      border: 1px solid black;
+      padding: 15px;
+      margin-bottom: 20px;
+      width: 400px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 8px;
+      font-size: 14px;
+    }
+    .counter {
+      margin-top: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h3>Live Character Counter</h3>
+    <textarea id="textarea1" placeholder="Start typing..."></textarea>
+    <p class="counter">Characters: <span id="count1">0</span></p>
+  </div>
+
+  
+  <script>
+    function updateCounter(textarea, counterId) {
+      document.getElementById(counterId).textContent = textarea.value.length;
+    }
+
+    // Get references
+    const textarea1 = document.getElementById("textarea1");
+    
+
+    // Update initially for pre-filled textarea
+    updateCounter(textarea1, "count1");
+    
+    // Add event listeners
+    textarea1.addEventListener("input", () => updateCounter(textarea1, "count1"));
+    
+  </script>
+
+</body>
+</html>

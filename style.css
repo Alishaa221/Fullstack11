@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  font-family: 'Merriweather', serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+.container {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+}
+
+header {
+  grid-area: header;
+  background: #A67B5B;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  background: #fff4c3;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
+.sidebar a {
+  margin: 10px 0;
+  color: #333;
+  text-decoration: none;
+}
+.sidebar ul li a {
+  display: block;
+  padding: 8px 0;
+  color: #8B6F47;      
+  text-decoration: none;  
+  font-weight: bold;
+}
+
+.sidebar ul li a:hover {
+  color: #C19A6B;         
+  text-decoration: underline;
+}
+
+main {
+  grid-area: main;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+}
+
+footer {
+  grid-area: footer;
+  background: #A67B5B;
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
+body.dark {
+  background: #222;
+  color: #ddd;
+}
+
+body.dark header,
+body.dark footer {
+  background: #333;
+}
+
+body.dark .sidebar {
+  background: #444;
+}
+
+body.dark .sidebar a {
+  color: #ddd;
+}
